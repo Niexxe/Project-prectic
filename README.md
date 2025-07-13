@@ -1,4 +1,4 @@
-# Crawl
+# Search
 
 Each crawler goes through some source and pulls out exclusively useful data - text. Does not depend on extension. Easily customizable.
 Supported file types: `text`, `xml`/`html`, `doc`/`docx`, `xls`/`xlsx`, `powerpoint`, `visio`, `pdf`, `archives`, `exe`/`bin`, `cab`/`rpm`/`deb`, `thumbsdb`,`lnk`, `bytecode`,`pcap`,`evtx`,`sqlite`, `images`, `sounds`, `videos`.
