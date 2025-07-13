@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link href="/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+  <link href="/jquery-ui/themes/base/jquery-ui.css" rel="stylesheet">
+  <style> .pointer { cursor: pointer; } .well { padding-bottom: 0; } .input-group {padding-bottom: 10px;} .nav-tabs > li > a {padding-top: 4px; padding-bottom: 4px;} </style>
+  <script src="/jquery/dist/jquery.min.js"></script>
+  <script src="/jquery-ui/jquery-ui.min.js"></script>
+  <script>
+  function offset(o)
+  {
+    var uri = location.protocol + '//' + location.host + location.pathname + '?'
+    location.search.split('?').pop().split('&').map( function(arg) {
+      uri += ( arg.split('=')[0] != 'o' ) ? arg+'&' : ''
+    } )
+    location = uri + 'o=' + o
+  }
+
+  function new_tab(uri)
+  {
+    window.open(uri, '_blank')
+  }
+
+  $(document).ready( function() {
+    $("#query").autocomplete( {
+      source: function(request, response) {
+        $.ajax( {
+          url: "auto",
+          data: {q: request.term},
+          success: function(data) { response(data) }
+        } )
+      },
+      minLength: 2
+    } ) 
+  } )
+  </script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="well row row-eq-height">
+    <form name="form" method="GET">
+     <div class="col-md-10 col-md-offset-1">
+       <div class="input-group">
+        <input id="query" type="text" name="q" class="form-control" value="<%= query %>">
+        <input type="hidden" name="images" value=1>
+        <span class="input-group-btn">
+         <button class="btn btn-primary" type="button" onclick="document.form.submit()">искать</button>
+        </span>
+       </div>
+       <ul class="nav nav-tabs">
+        <li><a data-toggle="tab" href="#" onclick="document.form.images.value=0;document.form.submit()">Все</a></li>
+        <li class="active"><a data-toggle="tab" href="#" onclick="document.form.images.value=1;document.form.submit()">Картинки</a></li>
+       </ul>
+       <div class="tab-content">
+        <div id="text" class="tab-pane fade in active"></div>
+        <div id="images" class="tab-pane fade in active"></div>
+      </div>
+     </div>
+    </form>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <p class="text-muted">Результатов: <%= pages.length + (offset-1)*40 %>/<%= found %></p>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+ <div class="row">
+  <div class="container col-md-10 col-md-offset-1">
+   <% pages.forEach( function(page) { 
+    if (page.filetype == "image") { %>
+    <div class="col-lg-3">
+    <figure class="figure">
+      <img src="/images/<%=page.url.replace(/<\/?b>/g,'').replace(/\//g,'-')%>" class="figure-img img-thumbnail rounded" alt="<%=page.title%>">
+      <figcaption class="figure-caption"><a target="_blank" href="<%=page.href%>"><%- page.title %></a></figcaption>
+      <figcaption class="figure-caption"><span class="text-success pointer" onclick="new_tab('<%=page.cache%>')"><%- page.url %></span></figcaption>
+      <figcaption class="figure-caption"><%- page.matches.slice(0,200) %></figcaption>
+    </figure>
+    </div>
+   <% }
+   } ) %>
+  </div>
+ </div>
+</div>
+
+<footer>
+<div class="container-fluid">
+<div class="row">
+<div class="col-md-10 col-md-offset-5">
+<div class="btn-toolbar" role="toolbar">
+  <button class="btn btn-default" type="button" onclick="offset(<%= offset-1 %>)">&laquo</button>
+  <div class="btn-group">
+    <% for(var i = (offset>2) ? offset-2 : offset; i < ((offset>2) ? offset+3 : offset+5); i++) { %>
+    <button class="btn <%= (i==offset) ? 'btn-info' : 'btn-default' %>" onclick="offset(this.innerHTML)" type="button"><%= i %></button>
+    <% } %>
+  </div>
+  <button class="btn btn-default" type="button" onclick="offset(<%= offset+1 %>)">&raquo</button>
+</div>
+</div>
+</div>
+</div>
+</footer>
+
+</body>
+</html>
